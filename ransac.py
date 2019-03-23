@@ -3,7 +3,8 @@ import ctypes
 import numpy as np
 
 
-lib = ctypes.CDLL(os.path.join('lib', 'libransac.so'))
+here = os.path.dirname(os.path.abspath(__file__))
+lib = ctypes.CDLL(os.path.join(here, 'lib', 'libransac.so'))
 
 
 def find_fundamental_matrix(matches, ntrials=1000, max_err=0.3):
