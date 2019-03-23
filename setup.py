@@ -16,15 +16,15 @@ def readme():
 
 class CustomDevelop(develop):  # needed for "pip install -e ."
     def run(self):
-        subprocess.check_call("make", shell=True)
+        subprocess.check_call("make lib", shell=True)
         super().run()
 
 
 class CustomBuildPy(build_py):  # needed for "pip install ransac"
     def run(self):
         super().run()
-        subprocess.check_call("make", shell=True)
-        subprocess.check_call("cp -r bin lib build/lib/", shell=True)
+        subprocess.check_call("make lib", shell=True)
+        subprocess.check_call("cp -r lib build/lib/", shell=True)
 
 
 requirements = ['numpy']

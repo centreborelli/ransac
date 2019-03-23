@@ -9,22 +9,17 @@ ifeq ($(CVERSION),)
 CFLAGS := $(CFLAGS) -std=gnu99
 endif
 
-BINDIR = bin
-LIBDIR = lib
+default: bin/ransac
 
-default: $(BINDIR) $(BINDIR)/ransac $(LIBDIR) $(LIBDIR)/libransac.so
+lib: lib/libransac.so
 
-$(BINDIR)/ransac: c/ransac.c c/fail.c c/xmalloc.c c/xfopen.c c/homographies.c c/ransac_cases.c c/parsenumbers.c c/random.c
+bin/ransac: c/ransac.c c/*.c
+	mkdir -p bin
 	$(CC) $(CFLAGS) $< -lm -o $@
 
-$(LIBDIR)/libransac.so: c/ransac.c c/fail.c c/xmalloc.c c/xfopen.c c/homographies.c c/ransac_cases.c c/parsenumbers.c c/random.c
+lib/libransac.so: c/ransac.c c/*.c
+	mkdir -p lib
 	$(CC) $(CFLAGS) -shared -o $@ $<
-
-$(BINDIR):
-	mkdir -p $(BINDIR)
-
-$(LIBDIR):
-	mkdir -p $(LIBDIR)
 
 clean:
 	rm -rf bin
