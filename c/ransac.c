@@ -38,7 +38,7 @@ typedef bool (ransac_model_accepting_function)(
 // API function: evaluate a given model over the data, and fill a mask with the
 // inliers (according to the given allowed error).  This function returns the
 // number of inliers.
-int ransac_trial(
+static int ransac_trial(
 		// output
 		bool *out_mask,    // array mask identifying the inliers
 
@@ -98,15 +98,6 @@ static bool are_different(int *t, int n)
 	return true;
 }
 
-static int randombounds(int a, int b)
-{
-	if (b < a)
-		fail("the interval [%d, %d] is empty!", a, b);
-	if (b == a)
-		return b;
-	return a + lcg_knuth_rand()%(b - a + 1);
-}
-
 static void swap(void *a, void *b, size_t s)
 {
 #if 0
@@ -128,7 +119,7 @@ static void swap(void *a, void *b, size_t s)
 }
 
 // fisher-yates
-void shuffle(void *t, int n, size_t s)
+static void shuffle(void *t, int n, size_t s)
 {
 	char *c = t;
 
@@ -183,9 +174,8 @@ static void fill_random_indices(int *idx, int n, int a, int b)
 // by hand, and then the inliers of a model are defined as the data points
 // which fit the model up to the allowed error.  The RANSAC algorithm randomly
 // tries several models and keeps the one with the largest number of inliers.
-int ransac(
+static int ransac(
 		// output
-		//int *out_ninliers, // number of inliers
 		bool *out_mask,    // array mask identifying the inliers
 		float *out_model,  // model parameters
 
@@ -210,14 +200,14 @@ int ransac(
 		void *usr
 		)
 {
-//	fprintf(stderr, "running RANSAC over %d datapoints of dimension %d\n",
-//			n, datadim);
-//	fprintf(stderr, "will try to find a model of size %d from %d points\n",
-//		       	modeldim, nfit);
-//	fprintf(stderr, "we will make %d trials and keep the best with e<%g\n",
-//			ntrials, max_error);
-//	fprintf(stderr, "a model must have more than %d inliers\n",
-//			min_inliers);
+	fprintf(stderr, "running RANSAC over %d datapoints of dimension %d\n",
+			n, datadim);
+	fprintf(stderr, "will try to find a model of size %d from %d points\n",
+		       	modeldim, nfit);
+	fprintf(stderr, "we will make %d trials and keep the best with e<%g\n",
+			ntrials, max_error);
+	fprintf(stderr, "a model must have more than %d inliers\n",
+			min_inliers);
 
 	if (n < nfit)
 	  return 0;
@@ -261,10 +251,10 @@ int ransac(
 		}
 	}
 
-//	fprintf(stderr, "RANSAC found this best model:");
-//	for (int i = 0; i < modeldim; i++)
-//		fprintf(stderr, " %g", best_model[i]);
-//	fprintf(stderr, "\n");
+	fprintf(stderr, "RANSAC found this best model:");
+	for (int i = 0; i < modeldim; i++)
+		fprintf(stderr, " %g", best_model[i]);
+	fprintf(stderr, "\n");
 	if (0) {
 		FILE *f = xfopen("/tmp/ramo.txt", "w");
 		for (int i = 0; i < modeldim; i++)
@@ -396,7 +386,12 @@ int main_cases(int c, char *v[])
 		model_evaluation = epipolar_error;
 		model_generation = seven_point_algorithm;
 		//model_acceptation = fundamental_matrix_is_reasonable;
-
+	} else if (0 == strcmp(model_id, "fma")) { // affine fundamental matrix
+		datadim = 4;
+		modeldim = 9;
+		nfit = 4;
+		model_evaluation = epipolar_error;
+		model_generation = affine_fundamental_matrix;
 	} else if (0 == strcmp(model_id, "fmn")) { // fundamental matrix
 		int main_hack_fundamental_matrix(int,char*[]);
 		return main_hack_fundamental_matrix(c-1, v+1);
@@ -466,17 +461,19 @@ int main_cases(int c, char *v[])
 
 int main_hack_fundamental_matrix(int c, char *v[])
 {
-	if (c < 4) {
+	if (c != 5 && c != 6 && c != 7) {
 		fprintf(stderr, "usage:\n\t%s fmn "
 		//                         -1   0
-			"ntrials maxerr minliers [inliers] <data\n", *v);
-		//       1       2      3        4
+		"ntrials maxerr minliers omodel [omask [oinliers]] <data\n",*v);
+		//     1 2      3        4       5      6
 		return EXIT_FAILURE;
 	}
 	int ntrials = atoi(v[1]);
 	float maxerr = atof(v[2]);
 	int minliers = atoi(v[3]);
-	char *inliers_filename = v[4];
+	char *filename_omodel =  c > 4 ? v[4] : 0;
+	char *filename_omask =   c > 5 ? v[5] : 0;
+	char *filename_inliers = c > 6 ? v[6] : 0;
 
 	fprintf(stderr, "WARNING: ignoring parameter minliers=%d\n", minliers);
 
@@ -524,9 +521,9 @@ int main_hack_fundamental_matrix(int c, char *v[])
 	}
 #endif
 
-	// if needed, print the inliers
-	if (inliers_filename) {
-		FILE *f = xfopen(inliers_filename, "w");
+	// if requested, save the inlying data points
+	if (filename_inliers) {
+		FILE *f = xfopen(filename_inliers, "w");
 		for (int i = 0; i < n; i++)
 			if (mask[i]) {
 				for(int d = 0; d < datadim; d++)
@@ -535,16 +532,26 @@ int main_hack_fundamental_matrix(int c, char *v[])
 			}
 		xfclose(f);
 	}
-	if (false) {
-		FILE *f = xfopen("/tmp/omask.txt", "w");
+
+	// if requested, save the inlier mask
+	if (filename_omask) {
+		FILE *f = xfopen(filename_omask, "w");
 		for (int i = 0; i < n; i++)
 			fprintf(f, mask[i]?" 1":" 0");
 		fprintf(f, "\n");
 		xfclose(f);
 	}
 
-	free(mask);
-	free(data);
+	// if requested, save the model
+	if (filename_omodel) {
+		FILE *f = xfopen(filename_omodel, "w");
+		for (int i = 0; i < modeldim; i++)
+			fprintf(f, "%a%c", model[i], i==modeldim-1?'\n':' ');
+		xfclose(f);
+	}
+
+	//free(mask);
+	//free(data);
 
 	return EXIT_SUCCESS;
 }
@@ -637,8 +644,12 @@ int main_hack_fundamental_trimatrix(int c, char *v[])
 
 
 
-int main(int c, char *v[])
+int main_ransac(int c, char *v[])
 {
 	return main_cases(c, v);
 }
+
+#ifndef HIDE_ALL_MAINS
+int main(int c, char **v) { return main_ransac(c, v); }
+#endif
 #endif//OMIT_MAIN

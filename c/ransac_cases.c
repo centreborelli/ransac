@@ -14,6 +14,7 @@
 // 	nfit = 2 (number of points that determine a straight line)
 
 // instance of "ransac_error_evaluation_function"
+static
 float distance_of_point_to_straight_line(float *line, float *point, void *usr)
 {
 	float n = hypot(line[0], line[1]);
@@ -28,6 +29,7 @@ float distance_of_point_to_straight_line(float *line, float *point, void *usr)
 
 
 // instance of "ransac_model_generating_function"
+static
 int straight_line_through_two_points(float *line, float *points, void *usr)
 {
 	float ax = points[0];
@@ -49,6 +51,7 @@ int straight_line_through_two_points(float *line, float *points, void *usr)
 	return 1;
 }
 
+static
 int find_straight_line_by_ransac(bool *out_mask, float line[3],
 		float *points, int npoints,
 		int ntrials, float max_err)
@@ -142,6 +145,7 @@ double find_affinity(double *A, double *x, double *y, double *xp, double *yp)
 }
 
 // instance of "ransac_model_generating_function"
+static
 int affine_map_from_three_pairs(float *aff, float *pairs, void *usr)
 {
 	// call the function "find_affinity" from elsewhere
@@ -157,7 +161,7 @@ int affine_map_from_three_pairs(float *aff, float *pairs, void *usr)
 }
 
 // instance of "ransac_model_accepting_function"
-bool affine_map_is_reasonable(float *aff, void *usr)
+static bool affine_map_is_reasonable(float *aff, void *usr)
 {
 	float a = aff[0];
 	float b = aff[1];
@@ -173,6 +177,7 @@ bool affine_map_is_reasonable(float *aff, void *usr)
 	return true;
 }
 
+static
 int find_affinity_by_ransac(bool *out_mask, float affinity[6],
 		float *pairs, int npairs,
 		int ntrials, float max_err)
@@ -220,6 +225,7 @@ static float homographic_match_error(float *hom, float *pair, void *usr)
 
 
 // instance of "ransac_model_generating_function"
+static
 int homography_from_four(float *hom, float *pairs, void *usr)
 {
 	double a[2] = {pairs[0], pairs[1]};
@@ -263,6 +269,7 @@ int homography_from_four(float *hom, float *pairs, void *usr)
 //}
 
 
+
 // ************************************
 // ************************************
 // ************************************
@@ -286,6 +293,7 @@ static float fnorm(float *a, int n)
 
 #include "moistiv_epipolar.c"
 // instance of "ransac_model_generating_function"
+static
 int seven_point_algorithm(float *fm, float *p, void *usr)
 {
 	int K[7] = {0, 1, 2, 3, 4, 5, 6};
@@ -298,7 +306,7 @@ int seven_point_algorithm(float *fm, float *p, void *usr)
 	int r = moistiv_epipolar(m1, m2, K, z, F1, F2);
 	//MAT_PRINT_4X4(F1);
 	//MAT_PRINT_4X4(F2);
-	int ridx = 0;
+	//int ridx = 0;
 	//if (r == 3) ridx = random_index(0, 3);
 	//fprintf(stderr, "z = %g\n", z[ridx]);
 	int cx = 0;
@@ -343,7 +351,7 @@ static float epipolar_euclidean_error(float *fm, float *pair, void *usr)
 		       fm[1]*p[0] + fm[4]*p[1] + fm[7],
 		       fm[2]*p[0] + fm[5]*p[1] + fm[8]};
 	float npf = hypot(pf[0], pf[1]);
-	if (npf == 0)  // the epipolar line is (0, 0, 1), ie the line at infinity
+	if (npf == 0) // the epipolar line is (0, 0, 1), ie the line at infinity
 		return INFINITY;
 	else {
 		pf[0] /= npf; pf[1] /= npf; pf[2] /= npf;
@@ -380,8 +388,8 @@ static float epipolar_error(float *fm, float *pair, void *usr)
 {
 	ransac_error_evaluation_function *f;
 	//f = epipolar_algebraic_error;
-	f = epipolar_euclidean_error;
-	//f = epipolar_euclidean_error_sym;
+	//f = epipolar_euclidean_error;
+	f = epipolar_euclidean_error_sym;
 	return f(fm, pair, usr);
 }
 
@@ -397,6 +405,7 @@ static float epipolar_error_triplet(float *fm, float *pair, void *usr)
 }
 
 // instance of "ransac_model_generating_function"
+static
 int two_seven_point_algorithms(float *fm, float *p, void *usr)
 {
 	// p has 42 numbers
@@ -460,6 +469,7 @@ static void mprod33(float *ab_out, float *a_in, float *b_in)
 		about[i][j] = ab[i][j];
 }
 
+static
 int find_fundamental_matrix_by_ransac(
 	bool *out_mask, float out_fm[9],
 		float *pairs, int npairs,
@@ -476,11 +486,11 @@ int find_fundamental_matrix_by_ransac(
 	float PDev = (pdev[0]+pdev[1]+pdev[2]+pdev[3])/4;
 	float pDev[4] = {PDev, PDev, PDev, PDev};
 
-//	fprintf(stderr, "pmean = %g %g %g %g\n",
-//			pmean[0], pmean[1], pmean[2], pmean[3]);
-//	fprintf(stderr, "pdev = %g %g %g %g\n",
-//			pdev[0], pdev[1], pdev[2], pdev[3]);
-//	fprintf(stderr, "normalization factor = %g\n", PDev);
+	fprintf(stderr, "pmean = %g %g %g %g\n",
+			pmean[0], pmean[1], pmean[2], pmean[3]);
+	fprintf(stderr, "pdev = %g %g %g %g\n",
+			pdev[0], pdev[1], pdev[2], pdev[3]);
+	fprintf(stderr, "normalization factor = %g\n", PDev);
 
 	// normalize input
 	float *pairsn = xmalloc(4*npairs*sizeof*pairsn);
@@ -546,6 +556,7 @@ int find_fundamental_matrix_by_ransac(
 }
 
 // finds a pair of fundamental matrices
+static
 int find_fundamental_pair_by_ransac(bool *out_mask, float out_fm[18],
 		float *trips, int ntrips,
 		int ntrials, float max_err)
@@ -637,6 +648,34 @@ int find_fundamental_pair_by_ransac(bool *out_mask, float out_fm[18],
 	free(tripsn);
 	return n_inliers;
 }
+
+// affine fundamental matrix
+// 	datadim = 4 (coordinates of each pair)
+// 	modeldim = 9 (fundamental matrix)
+// 	nfit = 4 (four-point algorithm, explicit formula)
+
+// instance of "ransac_model_generating_function"
+#include "exterior_algebra.c"
+static int affine_fundamental_matrix(float *fm, float *p, void *usr)
+{
+	double x[4][5] = {
+		{p[0],  p[1],  p[2],  p[3],  1},
+		{p[4],  p[5],  p[6],  p[7],  1},
+		{p[8],  p[9],  p[10], p[11], 1},
+		{p[12], p[13], p[14], p[15], 1}
+	};
+	double y[2][10], z[5];
+	exterior_product_10_5_5(y[0], x[0], x[1]);
+	exterior_product_10_5_5(y[1], x[2], x[3]);
+	exterior_product_5_10_10(z, y[0], y[1]);
+	fm[0] = 0   ; fm[1] = 0   ; fm[2] = z[0];
+	fm[3] = 0   ; fm[4] = 0   ; fm[5] = z[1];
+	fm[6] = z[2]; fm[7] = z[3]; fm[8] = z[4];
+	return 1;
+}
+
+
+
 
 
 // ************************************

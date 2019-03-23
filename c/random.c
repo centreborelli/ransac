@@ -18,12 +18,12 @@
 
 static uint64_t lcg_knuth_seed = 0;
 
-void lcg_knuth_srand(uint32_t x)
+static void lcg_knuth_srand(uint32_t x)
 {
 	lcg_knuth_seed = x;
 }
 
-uint32_t lcg_knuth_rand(void)
+static uint32_t lcg_knuth_rand(void)
 {
 	lcg_knuth_seed *= 6364136223846793005;
 	lcg_knuth_seed += 1442695040888963407;
@@ -41,6 +41,7 @@ static int xrand(void)
 	return lcg_knuth_rand();
 }
 
+// warning: the low bits will be set to zero (!) when converting to float
 static double random_raw(void)
 {
 	return xrand();
@@ -71,6 +72,15 @@ static double random_normal(void)
 	double y = sqrt(-2*log(x1)) * cos(2*M_PI*x2);
 	//double y2 = sqrt(-2*log(x1)) * sin(2*M_PI*x2);
 	return y;
+}
+
+static int randombounds(int a, int b)
+{
+	if (b < a)
+		return randombounds(b, a);
+	if (b == a)
+		return b;
+	return a + lcg_knuth_rand() % (b - a + 1);
 }
 
 static double random_laplace(void)

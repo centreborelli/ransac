@@ -3,10 +3,10 @@
  Authors: David Auber, Romain Bourqui, Patrick Mary, Morgan Mathiaut
  from the LaBRI Visualization Team
  Email : auber@tulip-software.org
- Last modification : 07/07/2008
+ Last modification : 07/07/2008 
  This program is free software; you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation; either version 2 of the License, or
+ it under the terms of the GNU General Public License as published by  
+ the Free Software Foundation; either version 2 of the License, or     
  (at your option) any later version.
 */
 
@@ -16,7 +16,7 @@
  * FUNCTION:
  * This file contains a number of utilities useful for handling
  * 3D vectors
- *
+ * 
  * HISTORY:
  * Written by Linas Vepstas, August 1991
  * Added 2D code, March 1993
