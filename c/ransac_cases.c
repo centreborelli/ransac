@@ -469,7 +469,6 @@ static void mprod33(float *ab_out, float *a_in, float *b_in)
 		about[i][j] = ab[i][j];
 }
 
-static
 int find_fundamental_matrix_by_ransac(
 	bool *out_mask, float out_fm[9],
 		float *pairs, int npairs,
