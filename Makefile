@@ -19,7 +19,7 @@ bin/ransac: c/ransac.c c/*.c
 
 lib/libransac.so: c/ransac.c c/*.c
 	mkdir -p lib
-	$(CC) $(CFLAGS) -shared -o $@ $<
+	$(CC) $(CFLAGS) -fPIC -shared -o $@ $<
 
 clean:
 	rm -rf bin
