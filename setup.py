@@ -2,8 +2,7 @@ import os
 import subprocess
 from codecs import open
 from setuptools import setup
-from setuptools.command.develop import develop
-from setuptools.command.build_py import build_py
+from setuptools.command import develop, build_py
 
 
 here = os.path.abspath(os.path.dirname(__file__))
@@ -14,24 +13,31 @@ def readme():
         return f.read()
 
 
-class CustomDevelop(develop):  # needed for "pip install -e ."
+class CustomDevelop(develop.develop, object):
+    """
+    Class needed for "pip install -e ."
+    """
     def run(self):
         subprocess.check_call("make lib", shell=True)
-        super().run()
+        super(CustomDevelop, self).run()
 
 
-class CustomBuildPy(build_py):  # needed for "pip install ransac"
+class CustomBuildPy(build_py.build_py, object):
+    """
+    Class needed for "pip install ransac"
+    """
     def run(self):
-        super().run()
+        super(CustomBuildPy, self).run()
         subprocess.check_call("make lib", shell=True)
         subprocess.check_call("cp -r lib build/lib/", shell=True)
+
 
 
 requirements = ['numpy']
 
 
 setup(name="ransac",
-      version="1.0a3",
+      version="1.0a5",
       description="Python wrapper of Enric Meinhardt's RANSAC implementation",
       long_description=readme(),
       long_description_content_type="text/markdown",
