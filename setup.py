@@ -31,7 +31,7 @@ requirements = ['numpy']
 
 
 setup(name="ransac",
-      version="1.0a1",
+      version="1.0a2",
       description="Python wrapper of Enric Meinhardt's RANSAC implementation",
       long_description=readme(),
       long_description_content_type="text/markdown",
