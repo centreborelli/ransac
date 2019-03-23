@@ -485,11 +485,11 @@ int find_fundamental_matrix_by_ransac(
 	float PDev = (pdev[0]+pdev[1]+pdev[2]+pdev[3])/4;
 	float pDev[4] = {PDev, PDev, PDev, PDev};
 
-	fprintf(stderr, "pmean = %g %g %g %g\n",
-			pmean[0], pmean[1], pmean[2], pmean[3]);
-	fprintf(stderr, "pdev = %g %g %g %g\n",
-			pdev[0], pdev[1], pdev[2], pdev[3]);
-	fprintf(stderr, "normalization factor = %g\n", PDev);
+//	fprintf(stderr, "pmean = %g %g %g %g\n",
+//			pmean[0], pmean[1], pmean[2], pmean[3]);
+//	fprintf(stderr, "pdev = %g %g %g %g\n",
+//			pdev[0], pdev[1], pdev[2], pdev[3]);
+//	fprintf(stderr, "normalization factor = %g\n", PDev);
 
 	// normalize input
 	float *pairsn = xmalloc(4*npairs*sizeof*pairsn);
