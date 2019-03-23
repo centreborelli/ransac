@@ -21,5 +21,5 @@ Alternatively, it can be installed from sources in editable mode with
     import numpy as np
     import ransac
 
-    matches = np.loadtxt("tests/data/m.txt")
-    inliers, F = ransac.find_fundamental_matrix(m)
+    matches = np.loadtxt("tests/data/matches.txt")
+    inliers, F = ransac.find_fundamental_matrix(matches)
