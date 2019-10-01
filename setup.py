@@ -35,6 +35,7 @@ class CustomBuildPy(build_py.build_py, object):
 
 requirements = ['numpy']
 
+extras_require = {'test': ['pytest']}
 
 setup(name="ransac",
       version="1.0a5",
@@ -46,5 +47,6 @@ setup(name="ransac",
       author_email="carlo.de-franchis@ens-cachan.fr",
       py_modules=["ransac"],
       install_requires=requirements,
+      extras_require=extras_require,
       cmdclass={'develop': CustomDevelop,
                 'build_py': CustomBuildPy})
