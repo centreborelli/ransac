@@ -1,5 +1,8 @@
 # RANSAC
 
+[![Build Status](https://travis-ci.com/cmla/ransac.svg?branch=dev)](https://travis-ci.com/cmla/ransac)
+[![PyPI version](https://img.shields.io/pypi/v/ransac)](https://pypi.org/project/ransac)
+
 Python wrapper around Enric Meinhardt's C implementation of RANSAC distributed
 in [imscript](https://github.com/mnhrdt/imscript).
 
@@ -13,7 +16,8 @@ The `ransac` Python package can be installed from PyPI with
 Alternatively, it can be installed from sources in editable mode with
 
     git clone https://github.com/cmla/ransac
-    pip install -e ransac
+    cd ransac
+    pip install -e .
 
 
 ## Usage
