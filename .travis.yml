@@ -1,0 +1,32 @@
+os: linux
+dist: xenial
+language: python
+python: 3.7
+
+install: pip install -e ".[test]"
+script: pytest
+
+jobs:
+  include:
+    - stage: test
+      name: "Python sdist installation"
+      install: skip
+      script:
+        - python setup.py sdist
+        - pip install dist/*.tar.gz
+    - stage: test
+    - stage: test
+      python: 2.7
+
+    - stage: deploy
+      if: tag IS present AND repo = cmla/ransac
+      install: skip
+      script: skip
+      deploy:
+        - provider: pypi
+          user: carlodef
+          password:
+            secure: iSiaNFmj0u6mnRy5x6H850OxxkFTthF8O8OlJCuB/tksL5RdOC2ODbbSsl6S88UMyrTkgyZYR8z8k76zRsBrZzd8pvk29MQ3aBYsp0/94JZFCpbC6hsYvMlk/amlfLJhrclrh5RunpSik7LuW3mobQzUvvCYPH6zu21uKJNshqD9La5rhJg2PB2k+L5wUtikof9qvrQ0TxAE5x13vTThZh/tOIpLt+hSJ/yaLZpHMd4htReIcczEVIJQWMH4yIowJOJNyAeDR6b0fGxjiVirmr1EztFKul3a7tRfTs/lXhTYKLA/0rnBP+/AKyk1cQerNcMze9jvU3LhaWEMe+1heczbBM41AwJghXWK6nY4TjBQYh3QAh0Rnx60S+KhQKms/iD0TVBwoMX7udJuXKNeBpYgmXFnpi2bOYFkR9vVbGsdUY7hTQRG/ujGEeDZ6LcFzDpoXPaVTY1TghZAij/2Y3JvbTuNhnjZDAieycYVJAy8Tt9yrk3uGFlGh1BCouP559cTxLLjGRG1fxYrDGTTlhsfP6hMgwxVcBGvA6Xi7bbdtbwuamqUHBGQBf7PinagJ9mbGJ/C2y1OROGyLhkoDq7xYT/xihKpJ99YZPV+9MImYjRdRUvYW5H56aRfTZcRtcN9iVJ6djq3UNbeywjkprmqvKydkab70fBul0RfW7c=
+          distributions: sdist
+          on:
+            tags: true
