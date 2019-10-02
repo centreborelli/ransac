@@ -1,6 +1,6 @@
 # RANSAC
 
-[![Build Status](https://travis-ci.com/cmla/ransac.svg?branch=dev)](https://travis-ci.com/cmla/ransac)
+[![Build Status](https://travis-ci.com/cmla/ransac.svg?branch=master)](https://travis-ci.com/cmla/ransac)
 [![PyPI version](https://img.shields.io/pypi/v/ransac)](https://pypi.org/project/ransac)
 
 Python wrapper around Enric Meinhardt's C implementation of RANSAC distributed
