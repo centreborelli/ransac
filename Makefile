@@ -1,4 +1,5 @@
-export CFLAGS = -O3
+CFLAGS ?=   -march=native -O3
+export CFLAGS
 
 # The following conditional statement appends "-std=gnu99" to CFLAGS when the
 # compiler does not define __STDC_VERSION__.  The idea is that many older
