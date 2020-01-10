@@ -38,7 +38,7 @@ requirements = ['numpy']
 extras_require = {'test': ['pytest']}
 
 setup(name="ransac",
-      version="1.0.1",
+      version="1.0.2",
       description="Python wrapper of Enric Meinhardt's RANSAC implementation",
       long_description=readme(),
       long_description_content_type="text/markdown",
