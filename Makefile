@@ -1,4 +1,4 @@
-CFLAGS ?=   -march=native -O3
+CFLAGS ?=   -march=native -O3 -mno-avx512f
 
 # The following conditional statement appends "-std=gnu99" to CFLAGS when the
 # compiler does not define __STDC_VERSION__.  The idea is that many older
