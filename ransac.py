@@ -34,7 +34,7 @@ def find_fundamental_matrix(matches, ntrials=1000, max_err=0.3):
     )
     lib.find_fundamental_matrix_by_ransac.restype = ctypes.c_int
 
-    inliers_mask = np.zeros(n, dtype=np.bool)
+    inliers_mask = np.zeros(n, dtype=bool)
     fundamental_matrix = np.zeros(9, dtype=np.float32)
     lib.find_fundamental_matrix_by_ransac(inliers_mask, fundamental_matrix,
                                           np.asarray(matches).astype(np.float32),
